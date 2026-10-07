@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Folio | Resume Builder</title>
+	<meta name="description" content="A calm, focused resume builder for turning your experience into a profile worth remembering.">
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+		:root {
+			--ink: #173c3a;
+			--muted: #66807b;
+			--paper: #961a1a;
+			--canvas: #b91515;
+			--line: #e6dcdc;
+			--mint: #c51515;
+			--coral: #f07d62;
+			--coral-dark: #c85d47;
+			--white: #ffffff;
+			--shadow: 0 24px 60px rgba(38, 73, 65, .11);
+		}
+
+		* { box-sizing: border-box; }
+		body {
+			margin: 0;
+			color: var(--ink);
+			background:
+				radial-gradient(circle at 90% 6%, rgba(240, 125, 98, .14), transparent 22rem),
+				linear-gradient(135deg, #eff5ef 0%, #f8f7f0 50%, #edf3ef 100%);
+			font-family: Manrope, sans-serif;
+		}
+		button, input, textarea { font: inherit; }
+		button { cursor: pointer; }
+		.shell { width: min(1440px, calc(100% - 48px)); margin: 0 auto; }
+		header { display: flex; align-items: center; justify-content: space-between; padding: 28px 0; }
+		.brand { display: flex; align-items: center; gap: 10px; font-size: 1.15rem; font-weight: 800; letter-spacing: -.04em; }
+		.brand-mark { display: grid; place-items: center; width: 30px; height: 30px; color: var(--paper); background: var(--ink); border-radius: 9px 9px 9px 2px; font: 500 .78rem 'DM Mono', monospace; }
+		.header-note { color: var(--muted); font-size: .78rem; letter-spacing: .02em; }
+		main { display: grid; grid-template-columns: minmax(340px, 470px) minmax(500px, 1fr); gap: 42px; align-items: start; padding: 45px 0 80px; }
+		.eyebrow { margin: 0 0 14px; color: var(--coral-dark); font: 500 .72rem 'DM Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
+		h1 { max-width: 480px; margin: 0; font-size: clamp(2.5rem, 5vw, 4.7rem); line-height: .98; letter-spacing: -.08em; }
+		.intro { max-width: 440px; margin: 22px 0 34px; color: var(--muted); line-height: 1.7; font-size: .95rem; }
+		.editor { padding: 25px; background: rgba(255, 255, 255, .64); border: 1px solid rgba(255, 255, 255, .8); border-radius: 18px; box-shadow: 0 12px 36px rgba(38, 73, 65, .06); }
+		.editor-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 21px; }
+		.editor-title { margin: 0; font-size: 1rem; letter-spacing: -.03em; }
+		.saved { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: .7rem; }
+		.saved::before { width: 6px; height: 6px; background: #5eaa82; border-radius: 50%; content: ''; }
+		.section { padding: 22px 0; border-top: 1px solid var(--line); }
+		.section:first-of-type { border-top: 0; padding-top: 0; }
+		.section-label { display: flex; align-items: center; gap: 9px; margin-bottom: 15px; font: 500 .67rem 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+		.section-number { display: grid; place-items: center; width: 21px; height: 21px; color: var(--paper); background: var(--ink); border-radius: 50%; font-size: .6rem; }
+		.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+		label { display: block; color: var(--muted); font-size: .68rem; font-weight: 700; }
+		label.full { grid-column: 1 / -1; }
+		input, textarea { width: 100%; margin-top: 7px; padding: 11px 12px; color: var(--ink); background: var(--white); border: 1px solid var(--line); border-radius: 8px; outline: 0; font-size: .8rem; transition: border-color .2s, box-shadow .2s; }
+		textarea { min-height: 88px; resize: vertical; line-height: 1.55; }
+		input:focus, textarea:focus { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(240, 125, 98, .13); }
+		.helper { margin: 8px 0 0; color: var(--muted); font-size: .67rem; }
+		.tag-list { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0 0; }
+		.tag { display: inline-flex; align-items: center; gap: 7px; padding: 7px 9px; color: var(--ink); background: var(--mint); border-radius: 5px; font-size: .7rem; }
+		.tag button { padding: 0; color: var(--muted); border: 0; background: transparent; font-size: 1rem; line-height: .7; }
+		.add-row { display: flex; gap: 8px; margin-top: 10px; }
+		.add-row input { margin: 0; }
+		.add-row button, .print-button { padding: 10px 14px; color: var(--paper); background: var(--ink); border: 0; border-radius: 7px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+		.add-row button:hover, .print-button:hover { background: #285754; }
+		.print-button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 16px; background: var(--coral); }
+		.print-button:hover { background: var(--coral-dark); }
+		.preview-wrap { position: sticky; top: 28px; }
+		.preview-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+		.preview-label { color: var(--muted); font: 500 .68rem 'DM Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
+		.a4 { min-height: 820px; padding: clamp(34px, 5vw, 64px); background: var(--paper); box-shadow: var(--shadow); }
+		.resume-head { padding-bottom: 31px; border-bottom: 2px solid var(--ink); }
+		.resume-name { margin: 0; font-size: clamp(2.5rem, 5vw, 4rem); line-height: .96; letter-spacing: -.08em; }
+		.resume-role { margin: 10px 0 18px; color: var(--coral-dark); font-size: .86rem; font-weight: 800; letter-spacing: .02em; }
+		.contact-line { display: flex; flex-wrap: wrap; gap: 7px 19px; color: var(--muted); font: 400 .68rem 'DM Mono', monospace; }
+		.contact-line span { display: inline-flex; align-items: center; gap: 6px; }
+		.contact-line span::before { color: var(--coral); content: '•'; }
+		.resume-body { display: grid; grid-template-columns: 1.6fr 1fr; gap: 40px; padding-top: 32px; }
+		.resume-section { margin-bottom: 31px; }
+		.resume-section h3 { margin: 0 0 14px; font: 500 .68rem 'DM Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
+		.resume-section h3::after { display: inline-block; width: 22px; height: 1px; margin: 0 0 3px 8px; background: var(--coral); content: ''; }
+		.summary { margin: 0; color: #4f6863; font-size: .78rem; line-height: 1.7; }
+		.job { margin-bottom: 22px; }
+		.job:last-child { margin-bottom: 0; }
+		.job-top { display: flex; justify-content: space-between; gap: 12px; }
+		.job-title { margin: 0; font-size: .83rem; font-weight: 800; }
+		.job-date { color: var(--muted); font: 400 .62rem 'DM Mono', monospace; white-space: nowrap; }
+		.job-company { margin: 4px 0 7px; color: var(--coral-dark); font-size: .7rem; font-weight: 700; }
+		.job-description { margin: 0; color: #4f6863; font-size: .72rem; line-height: 1.6; }
+		.skill-cloud { display: flex; flex-wrap: wrap; gap: 7px; }
+		.skill-cloud span { padding: 7px 9px; background: var(--mint); border-radius: 4px; font-size: .65rem; font-weight: 700; }
+		.education-item { margin-bottom: 17px; }
+		.education-item:last-child { margin-bottom: 0; }
+		.education-item strong { display: block; font-size: .75rem; }
+		.education-item span { display: block; margin-top: 4px; color: var(--muted); font-size: .68rem; line-height: 1.4; }
+		.empty { color: #9aac9f; font-style: italic; }
+		footer { padding-bottom: 32px; color: var(--muted); font: 400 .65rem 'DM Mono', monospace; text-align: center; }
+		@media (max-width: 950px) { main { grid-template-columns: 1fr; gap: 55px; } .preview-wrap { position: static; } .a4 { min-height: auto; } }
+		@media (max-width: 560px) { .shell { width: min(100% - 28px, 1440px); } header { padding: 19px 0; } .header-note { display: none; } main { padding: 30px 0 50px; } h1 { font-size: 3rem; } .editor { padding: 18px; } .field-grid { grid-template-columns: 1fr; } label.full { grid-column: auto; } .a4 { padding: 27px 23px; } .resume-body { grid-template-columns: 1fr; gap: 0; } .job-top { display: block; } .job-date { display: block; margin-top: 4px; } }
+		@media print { body { background: white; } header, .intro, .editor, .preview-bar, footer { display: none; } .shell { width: 100%; } main { display: block; padding: 0; } .a4 { min-height: 0; box-shadow: none; } }
+	</style>
+</head>
+<body>
+	<div class="shell">
+		<header>
+			<div class="brand"><span class="brand-mark">F</span> folio</div>
+			<div class="header-note">your work, in a better light</div>
+		</header>
+
+		<main>
+			<section class="intro-column">
+				<p class="eyebrow">Resume workspace / 01</p>
+				<h1>Make your next move memorable.</h1>
+				<p class="intro">A simple place to collect the work you are proud of. Add your details, refine your story, and leave with a resume that feels like you.</p>
+				<div class="editor">
+					<div class="editor-top"><h2 class="editor-title">Your information</h2><span class="saved" id="savedStatus">Auto-saved</span></div>
+					<div class="section">
+						<div class="section-label"><span class="section-number">01</span> Introduction</div>
+						<div class="field-grid">
+							<label>Full name<input id="name" placeholder="Alex Morgan"></label>
+							<label>Role / title<input id="role" placeholder="Product designer"></label>
+							<label>Email<input id="email" type="email" placeholder="alex@email.com"></label>
+							<label>Location<input id="location" placeholder="Lisbon, Portugal"></label>
+							<label class="full">Portfolio or LinkedIn<input id="website" placeholder="alexmorgan.design"></label>
+							<label class="full">Short bio<textarea id="summary" placeholder="A thoughtful designer turning complex ideas into clear, useful products."></textarea></label>
+						</div>
+					</div>
+					<div class="section">
+						<div class="section-label"><span class="section-number">02</span> Strengths</div>
+						<label>Skills</label>
+						<div class="add-row"><input id="skillInput" placeholder="Add a skill, then press Enter"><button id="addSkill" type="button">Add skill</button></div>
+						<div class="tag-list" id="skillTags"></div>
+					</div>
+					<div class="section">
+						<div class="section-label"><span class="section-number">03</span> Experience</div>
+						<div class="field-grid">
+							<label>Job title<input id="jobTitle" placeholder="Senior product designer"></label>
+							<label>Company<input id="company" placeholder="North Studio"></label>
+							<label>Dates<input id="jobDate" placeholder="2022 — present"></label>
+							<label>Location<input id="jobLocation" placeholder="Remote"></label>
+							<label class="full">What did you do?<textarea id="jobDescription" placeholder="Tell the story in one or two clear sentences."></textarea></label>
+						</div>
+					</div>
+					<div class="section">
+						<div class="section-label"><span class="section-number">04</span> Education</div>
+						<div class="field-grid">
+							<label>School<input id="school" placeholder="Rhode Island School of Design"></label>
+							<label>Degree<input id="degree" placeholder="BFA, Graphic Design"></label>
+							<label>Years<input id="educationDate" placeholder="2015 — 2019"></label>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="preview-wrap">
+				<div class="preview-bar"><span class="preview-label">Live preview / A4</span><button class="print-button" id="printButton" type="button"><span>↗</span> Print or save PDF</button></div>
+				<article class="a4" id="resumePreview">
+					<div class="resume-head">
+						<h2 class="resume-name" id="previewName">Bartolomeu Morgan</h2>
+						<p class="resume-role" id="previewRole">Product designer</p>
+						<div class="contact-line"><span id="previewEmail">alex@email.com</span><span id="previewLocation">Lisbon, Portugal</span><span id="previewWebsite">alexmorgan.design</span></div>
+					</div>
+					<div class="resume-body">
+						<div>
+							<section class="resume-section"><h3>Sobre mim❤️❤️❤️</h3><p class="summary" id="previewSummary">A thoughtful designer turning complex ideas into clear, useful products. Add a short introduction that gives people a sense of what you care about and how you work.</p></section>
+							<section class="resume-section"><h3>Minhas experiencias farmando aura</h3><div class="job"><div class="job-top"><h4 class="job-title" id="previewJobTitle">Senior product designer</h4><span class="job-date" id="previewJobDate">2022 — present</span></div><p class="job-company" id="previewCompany">North Studio · Remote</p><p class="job-description" id="previewJobDescription">Tell the story of the work you are proudest of, the problem you helped solve, and the difference it made.</p></div></section>
+						</div>
+						<aside>
+							<section class="resume-section"><h3>Capacidades Mentalitys</h3><div class="skill-cloud" id="previewSkills"></div></section>
+							<section class="resume-section"><h3>Aprenimento</h3><div class="education-item"><strong id="previewSchool">Rhode Island School of Design</strong><span id="previewDegree">BFA, Graphic Design · 2015 — 2019</span></div></section>
+						</aside>
+					</div>
+				</article>
+			</section>
+		</main>
+		<footer>Folio is your quiet corner for a better first impression.</footer>
+	</div>
+
+	<script>
+		const fields = ['name', 'role', 'email', 'location', 'website', 'summary', 'jobTitle', 'company', 'jobDate', 'jobLocation', 'jobDescription', 'school', 'degree', 'educationDate'];
+		const defaults = { name: 'Alex Morgan', role: 'Product designer', email: 'alex@email.com', location: 'Lisbon, Portugal', website: 'alexmorgan.design', summary: 'A thoughtful designer turning complex ideas into clear, useful products.', jobTitle: 'Senior product designer', company: 'North Studio', jobDate: '2022 — present', jobLocation: 'Remote', jobDescription: 'Tell the story of the work you are proudest of, the problem you helped solve, and the difference it made.', school: 'Rhode Island School of Design', degree: 'BFA, Graphic Design', educationDate: '2015 — 2019' };
+		let skills = JSON.parse(localStorage.getItem('folioSkills') || 'null') || ['Product strategy', 'Figma', 'Research', 'Prototyping'];
+		const $ = id => document.getElementById(id);
+		const value = id => $(id).value.trim() || defaults[id] || '';
+
+		function render() {
+			$('previewName').textContent = value('name'); $('previewRole').textContent = value('role'); $('previewEmail').textContent = value('email'); $('previewLocation').textContent = value('location'); $('previewWebsite').textContent = value('website');
+			$('previewSummary').textContent = value('summary'); $('previewJobTitle').textContent = value('jobTitle'); $('previewJobDate').textContent = value('jobDate'); $('previewCompany').textContent = value('company') + ' · ' + value('jobLocation'); $('previewJobDescription').textContent = value('jobDescription');
+			$('previewSchool').textContent = value('school'); $('previewDegree').textContent = value('degree') + ' · ' + value('educationDate');
+			$('skillTags').innerHTML = skills.map((skill, index) => `<span class="tag">${skill}<button type="button" aria-label="Remove ${skill}" data-index="${index}">×</button></span>`).join('');
+			$('previewSkills').innerHTML = skills.map(skill => `<span>${skill}</span>`).join('');
+			localStorage.setItem('folioData', JSON.stringify(Object.fromEntries(fields.map(id => [id, $(id).value])))); localStorage.setItem('folioSkills', JSON.stringify(skills)); $('savedStatus').textContent = 'Auto-saved';
+		}
+		const saved = JSON.parse(localStorage.getItem('folioData') || 'null');
+		fields.forEach(id => { $(id).value = saved && saved[id] !== undefined ? saved[id] : defaults[id]; $(id).addEventListener('input', render); });
+		function addSkill() { const input = $('skillInput'); const skill = input.value.trim(); if (skill && !skills.includes(skill)) { skills.push(skill); input.value = ''; render(); } }
+		$('addSkill').addEventListener('click', addSkill); $('skillInput').addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); addSkill(); } });
+		$('skillTags').addEventListener('click', event => { if (event.target.dataset.index !== undefined) { skills.splice(Number(event.target.dataset.index), 1); render(); } });
+		$('printButton').addEventListener('click', () => window.print()); render();
+	</script>
+</body>
+</html>
